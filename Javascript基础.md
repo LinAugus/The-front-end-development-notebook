@@ -1,0 +1,166 @@
+# Javascript基础
+
+## 简介
+> JavaScript，一种直译式脚本语言，是一种动态类型、基于原型的语言，内置支持类别。它的解释器被称为JavaScript引擎，为浏览器的一部分，广泛用于客户端的脚本语言，最早是在HTML网页上使用，用来给HTML网页增加动态功能。然而现在JavaScript也可被用于网络服务器，如Node.js。--维基百科
+
+javascript能做很多事情：
+
+- web前端，jQuery, Bootstrap, RequireJS等
+- 移动Web开发 (Mobile Web)，jQuery Mobile, zepto.js
+- Web后端，NodeJS
+- Hybrid App，PhoneGap, AppCan
+- 桌面应用，如 node-webkit,heX,Electron
+- 游戏，Cocos2d-js
+- 超越web,JavaScript在物联网的应用
+- 其他：浏览器插件等
+
+## 基础概念
+### 标识符
+所谓标识符是指变量、函数、属性的名字，或者函数的参数。标识符的书写有几个特征  
+1. 区分大小写
+2. 第一个字符必须是字母、下划线（_）、或者是$
+3. 后面的可以是字母、数字、下划线、$
+
+### 命名规范
+1. 变量使用驼峰命名法，第一个单词首字母小写，后面单词首字母大写
+2. 变量使用名词，方法函数使用动词开头，常量全部用大写字母，构造函数首字母大写
+3. 命名要包含语义
+```javascript
+var firstName;
+var isArray;
+var PI;
+function Person(){}
+```
+
+### 变量
+变量是对“值”的引用，javascript 用`var`来声明变量。
+`var a = 1;`
+声明变量未赋值，那么变量的值为 undefined。
+```
+var a;
+a // undefined
+```
+
+### 变量提升
+所谓变量提升，就是javascript引擎先解析代码，获取所有声明的变量，然后再一行一行地运行，而所有的变量以及声明语句，都会被提升到代码的头部。
+```javascript
+console.log(a); //undefined
+var a = 1;
+```
+### 语句
+语句是为了完成某种任务的操作，语句以分号结尾，一个分号就表示一个语句结束。
+```javascript
+var a = 1+2;
+var b = 'str';
+```
+
+### 注释
+注释就是在程序开发中添加的标注，方便阅读。js引擎会忽略这些语句。
+javascript有两种注释：一种是单行注释，另一种是多行注释。
+```javascript
+//单行注释
+var a＝1；//为变量a赋值
+/*
+多行注释
+*/
+function getName(id){
+	return id;
+}
+```
+
+## 数据类型
+Javascript 中的每一值，都属于某一种数据类型。Javascript的数据类型有六种（ES6新增了第七种Symbol）
+
+- 数值（number）：整数和小数（比如1和3.14）
+- 字符串（string）：字符组成的文本（比如"Hello World"）
+- 布尔值（boolean）：true（真）和false（假）两个特定值
+- undefined：表示“未定义”或不存在，即此处目前没有任何值
+- null：表示空缺，即此处应该有一个值，但目前为空
+- 对象（object）：各种值组成的集合
+
+通常，我们将数值、字符串、布尔值称为原始类型（primitive type）的值，即它们是最基本的数据类型，不能再细分了。而将对象称为合成类型（complex type）的值，因为一个对象往往是多个原始类型的值的合成，可以看作是一个存放各种值的容器。至于undefined和null，一般将它们看成两个特殊值。
+
+### 数据类型转换
+1. 转换函数
+	- toString() 转换为字符串，在JavaScript中所有数据类型都可以转换为string类型
+		```javascript
+		var n1 = 12;
+		var n2 = true;
+		var a = [1, 2, 3];
+		var o = {};
+		function f(){}
+		n1.toString(); //"12"
+		n2.toString(); //"true"
+		a.toString(); //"1,2,3"
+		o.toString(); //"[object Object]"
+		f.toString(); //"function f(){}"
+		```
+	- parseInt() 解析出一个string或者number类型的整数部分，如果没有可以转换的部分，则返回NaN（not a number）
+		```javascript
+		var n1 = "12";
+		var n2 = "23hello";
+		var n3 = "hello";
+		parseInt(n1); //12
+		parseInt(n2); //23
+		parseInt(n3); //NaN
+		```
+	- parseFloat() 解析出一个string的浮点数部分，如果没有可以转换的部分，则返回NaN（not a number）。
+		```javascript
+		var n1 = "1.2.3";
+		var n2 = "1.2hello"
+		var n3 = "hello"
+		parseFloat(n1); //1.2
+		parseFloat(n2); //1.2
+		parseFloat(n3); //NaN 
+		```
+2. 强制类型转换
+	- Boolean(value)——把给定的值转换成Boolean型； 
+		```javascript
+		Boolean(123); //true
+		Boolean(""); //false
+		Boolean([]); //true
+		Boolean({}); //true
+		Boolean(null); //false
+		Boolean(undefined); //false
+		```
+	- Number(value)——把给定的值转换成数字（可以是整数或浮点数）； 
+		```javascript
+		Number("123"); //123
+		Number("123h"); //NaN
+		Number(true); //1
+		Number(false); //0
+		Number(undefined); //NaN
+		Number(null); //0
+		Number([]); //0
+		Number({}); //NaN
+		```
+	- String(value)——把给定的值转换成字符串。 
+		```javascript
+		String(123); //"123"
+		String([1,2]); //"1,2"
+		String(undefined) //"undefined"
+		String(null) //"null"
+		String({}) //"[object Object]"
+		```
+
+3. 隐式转换
+	- 数字＋字符串：数字转换为字符串
+		`console.log(12+"12"); //1212`
+	- 数字＋布尔值：true转换为1，false转换为0
+		`console.log(12+true); //13`
+	- 字符串＋布尔值：布尔值转换为true或false
+		`console.log("hello"+true); //hellotrue`
+	- 布尔值＋布尔值
+		`console.log(true+true); //2`
+
+### null和undefined
+undefined 表示一种未知状态，声明了但没有初始化的变量，变量的值时一个未知状态。访问不存在的属性或对象window.xxx）方法没有明确返回值时，返回值是一个undefined.当对未声明的变量应用typeof运算符时，显示为undefined。
+null表示尚未存在的对象,null是一个有特殊意义的值。可以为变量赋值为null，此时变量的值为“已知状态”(不是undefined)，即null。（用来初始化变量，清除变量内容，释放内存）
+```
+undefined==null   //结果为true,但含义不同。
+undefined===null //false,两者类型不一致，前者为“undefined”，后者为“object”
+```
+
+
+
+
