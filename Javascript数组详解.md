@@ -24,7 +24,7 @@
 	arr.[10] = 'c'
 	arr.length //11
 	```
-从上面的输出结果可以看出，`length`属性可以动态变化，如果将length属性设为 0 ，就会将数组清空。如果设置的数小于原有的个数，那么在这个数后面的数值就自动删除了。反过来，如果设置的数大于原有的个数，数组的成员将增大，都为 `undefined`。
+	从上面的输出结果可以看出，`length`属性可以动态变化，如果将length属性设为 0 ，就会将数组清空。如果设置的数小于原有的个数，那么在这个数后面的数值就自动删除了。反过来，如果设置的数大于原有的个数，数组的成员将增大，都为 `undefined`。
 
 	```javascript
 	var a = [1,2];
@@ -40,7 +40,6 @@
 	- `push()`方法 在数组的末尾增加一个或多个元素，并返回数组的新长度。
 	- `unshift()`方法 在数组的开头增加一个或多个元素，并返回数组的新长度。
 	- `length` 属性
-
 
 	```javascript
 	var arr = [1, 2, 3]
@@ -265,9 +264,10 @@ var arr = Array.prototype.slice.call(arrayLike);
 10. every() some() 数组判断  
 	some表示只要某一个满足条件就OK，every表示全部满足条件才OK。  
 	用法：
+	
 	- arr.every(callback[, thisArg])  
 	- arr.some(callback[,thisArg])
-	
+
 	```javascript
 	var arr= [1, 2, 3, 4, 5];
 	arr.every(function(x){
@@ -283,8 +283,6 @@ var arr = Array.prototype.slice.call(arrayLike);
 		return x === 6;
 	}); // false
 	```
-	
-	
 11. reduce() reduceRight()  
 	reduce() 方法接收一个函数作为累加器（accumulator），数组中的每个值（从左到右）开始合并，最终为一个值。  两者都是用于迭代运算。区别是reduce从头开始迭代，reduceRight从尾开始迭代。
 
@@ -304,7 +302,6 @@ var arr = Array.prototype.slice.call(arrayLike);
 	}); // returns [0, 1, 2, 3, 4, 5]
 	```
 	
-
 12. indexOf() lastIndexOf() 数组检索  
 	用法：indexOf( searchElement, [fromIndex = 0]) ／ lastIndexOf( searchElement , [fromIndex = arr.length – 1])  
 	第一个参数searchElement即需要查找的元素。第二个参数fromIndex可选，指定开始查找的位置。如果忽略，indexOf默认是0，lastIndexOf默认是数组尾。  
