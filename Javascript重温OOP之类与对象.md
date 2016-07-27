@@ -152,7 +152,7 @@ console.log(p.constructor.prototype.constructor === Person); // true
 
 每一个构造函数都有一个`prototype`属性，指向另一个对象。这个对象的所有属性和方法，都会被构造函数的实例继承。
 
-这意味着，我们可以把那些不变的属性和方法，直接定义在prototype对象上。
+这意味着，我们可以把那些不变的属性和方法，直接定义在`prototype`对象上。
 
 ```js
 //构造函数模式
@@ -168,7 +168,7 @@ var p1 = new Person(20, 'allen');
 ```
 
 ## this
-`this`表示当前对象，如果在全局作用范围内使用this，则指代当前页面对象window； 如果在函数中使用this，则this指代什么是根据运行时此函数在什么对象上被调用。 我们还可以使用apply和call两个全局方法来改变函数中this的具体指向。
+`this`表示当前对象，如果在全局作用范围内使用`this`，则指代当前页面对象window； 如果在函数中使用`this`，则`this`指代什么是根据运行时此函数在什么对象上被调用。 我们还可以使用`apply`和`call`两个全局方法来改变函数中`this`的具体指向。
 
 
 ```js
