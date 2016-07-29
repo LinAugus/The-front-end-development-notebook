@@ -170,29 +170,86 @@ var p1 = new Person(20, 'allen');
 ## this
 `this`表示当前对象，如果在全局作用范围内使用`this`，则指代当前页面对象window； 如果在函数中使用`this`，则`this`指代什么是根据运行时此函数在什么对象上被调用。 我们还可以使用`apply`和`call`两个全局方法来改变函数中`this`的具体指向。
 
+### 1. 全局代码中的this
 
 ```js
-//第一种情况，全局范围内使用this指向window对象
 console.log(this === window); //true 全局范围内使用this指向window对象
+```
 
-//第二种情况，函数中使用this
+### 2. 普通的函数调用
+
+
+```js
 function f(){
-	this.name = "tony"; // this在运行时指向window对象
+	this.name = "tony"; // this在运行时指向window对象,在严格模式下则是undefined
 }
-//第三种情况，在对象中使用this
+```
+
+### 3. 在对象中使用
+
+```js
 var o = {
 	name: "tony",
 	print: function(){
 		console.log(this.name);  //this指向对象o，但是可以改变其指向
 	}
 };
-//第四种情况，在事件中使用this
+```
+
+### 4. 作为构造函数
+
+```js
+new F(); // 函数内部的this指向新创建的对象。
+```
+
+### 5. 多层嵌套的内部函数
+
+```js
+var name = "global";
+var person = {
+	name : "person",
+	hello : function(sth){
+		var sayhello = function(sth) {
+			console.log(this.name + " says " + sth);
+		};
+		sayhello(sth);
+	}
+}
+person.hello("hello world");//global says hello world
+```
+在内部函数中，this没有按预想的绑定到外层函数对象上，而是绑定到了全局对象。这里普遍被认为是JavaScript语言的设计错误，因为没有人想让内部函数中的this指向全局对象。一般的处理方式是将this作为变量保存下来，一般约定为that或者self：
+
+```js
+var name = "global";
+var person = {
+	name : "person",
+	hello : function(sth){
+		var that = this;
+		var sayhello = function(sth) {
+			console.log(that.name + " says " + sth);
+		};
+		sayhello(sth);
+	}
+}
+person.hello("hello world");//person says hello world
+```
+
+### 6. 事件中的this
+
+```js
 var ele = document.getElementById("id");
 ele.addEventListener('click',function(){
 	console.log(this);  //this指向dom元素
 });
 ```
-全局函数apply和call可以用来改变函数中this的指向。
+
+### 7. 使用apply和call改变this的指向
+apply和call类似，只是后面的参数是通过一个数组传入，而不是分开传入。两者都是将某个函数绑定到某个具体对象上使用，自然此时的this会被显式的设置为第一个参数。两者的方法定义：
+
+```js
+call( thisArg [，arg1，arg2，… ] );  // 参数列表，arg1，arg2，...
+apply(thisArg [，argArray] );     // 参数数组，argArray
+```
 
 ```js
 var name = 'global';
@@ -206,9 +263,50 @@ o.getName(); // job
 
 //用call或apply改变函数中this的指向
 o.getName.call(this); // global
-//this指的是window对象
 
+```
+简单的总结：
+
+1. 当函数作为对象的方法调用时，this指向该对象。
+2. 当函数作为淡出函数调用时，this指向全局对象（严格模式时，为undefined）
+3. 构造函数中的this指向新创建的对象
+4. 嵌套函数中的this不会继承上层函数的this，如果需要，可以用一个变量保存上层函数的this。
+
+### 8. `bind（）`
+一个问题：
+
+```js
+$("#ele").click = obj.handler;
+```
+如果在handler中用了this，this会绑定在obj上么？显然不是，赋值以后，函数是在回调中执行的，this会绑定到$(“#some-div”)元素上。那我们如何能解决回调函数绑定的问题？ES5中引入了一个新的方法，bind():
+
+```js
+fun.bind(thisArg[, arg1[, arg2[, ...]]])
+
+thisArg
+当绑定函数被调用时,该参数会作为原函数运行时的this指向.当使用new 操作符调用绑定函数时,该参数无效.
+arg1, arg2, ...
+当绑定函数被调用时,这些参数加上绑定函数本身的参数会按照顺序作为原函数运行时的参数.
+```
+该方法创建一个新函数，称为绑定函数，绑定函数会以创建它时传入bind方法的第一个参数作为this，传入bind方法的第二个以及以后的参数加上绑定函数运行时本身的参数按照顺序作为原函数的参数来调用原函数.
+
+```js
+$("#ele").click(person.hello.bind(person));
+//相应元素被点击时，输出person says hello world
+```
+该方法也很容易模拟，看下Prototype.js中bind方法的源码：
+
+```js
+Function.prototype.bind = function(){
+  var fn = this, args = Array.prototype.slice.call(arguments), object = args.shift();
+  return function(){
+    return fn.apply(object,
+      args.concat(Array.prototype.slice.call(arguments)));
+  };
+};
 ```
 
 ## 参考资料
 [js老生常谈之this,constructor ,prototype](http://www.haorooms.com/post/js_constructor_pro)
+
+[详解JavaScript中的this](http://blog.jobbole.com/39305/)
