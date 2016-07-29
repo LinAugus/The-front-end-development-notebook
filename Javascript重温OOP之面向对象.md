@@ -1,4 +1,7 @@
 # Javascript重温OOP之面向对象
+
+> 面向对象程序设计（Object-oriented programming，OOP）是一种程序设计范型，同时也是一种程序开发的方法。对象指的是类的实例。它将对象作为程序的基本单元，将程序和数据封装其中，以提高软件的重用性、灵活性和扩展性。——维基百科
+
 一般面向对象包含：继承，封装，多态，抽象
 
 ## 对象形式的继承
@@ -119,28 +122,216 @@ Programmer.prototype = Object.create(Person.prototype); //建立继承关系
 Programmer.prototype.constructor = Programmer;  // 修改constructor的指向
 ```
 
+### 调用父类方法
+
+```js
+function Person(name, age){
+	this.name = name;
+	this.age = age;
+}
+Person.prototype.headCount = 1;
+Person.prototype.eat = function(){
+	console.log('eating...');
+}
+
+function Programmer(name, age, title){
+	Person.apply(this, arguments); // 调用父类的构造器
+}
+
+
+Programmer.prototype = Object.create(Person.prototype);
+Programmer.prototype.constructor = Programmer;
+
+Programmer.prototype.language = "js";
+Programmer.prototype.work = function(){
+	console.log('i am working code in '+ this.language);
+	Person.prototype.eat.apply(this, arguments); // 调用父类上的方法
+}
+```
+
 ## 封装
 ### 命名空间
 js是没有命名空间的，因此可以用对象模拟。
 
 ```js
-var app = {};  // 用对象模拟命名空间
-app.module1 = {}; //模块1
-app.module1.method = function(){
-	console.log('module1 method');
+var app = {};  // 命名空间app
+//模块1
+app.module1 = {
+	name: 'allin',
+	f: function(){
+		console.log('hi robot');
+	}
 };
-app.module1.method();  //module1 method
+app.module1.name; // "allin"
+app.module1.f();  // hi robot
 ```
 ### 静态成员
 
 ```js
-var staticdemo = function(){
-	// 静态方法
-	var pname = 'allin';
+function Person(name){
+	var age = 100;
+	this.name = name;
+}
+//静态成员
+Person.walk = function(){
+	console.log('static');
+};
+Person.walk();  // static
+```
+### 私有与公有
+
+```js
+function Person(id){
+	// 私有属性与方法
+	var name = 'allin';
 	var work = function(){
-		console.log( name+ 'is working..');
+		console.log(this.id);
+	};
+	//公有属性与方法
+	this.id = id;
+	this.say = function(){
+		console.log('say hello');
+		work.call(this);
 	};
 };
-staticdemo.pname; // undefined
-staticdemo.work(); // demo.work is not a function(…)
+var p1 = new Person(123);
+p1.name; // undefined
+p1.id;  // 123
+p1.say();  // say hello 123
+
 ```
+
+### 模块化
+
+```js
+var moduleA;
+moduleA = function() {
+    var prop = 1;
+
+    function func() {}
+
+    return {
+        func: func,
+        prop: prop
+    };
+}(); // 立即执行匿名函数
+```
+prop，func 不会被泄露到全局作用域。或者另一种写法，使用 new
+
+```js
+moduleA = new function() {
+    var prop = 1;
+
+    function func() {}
+
+    this.func = func;
+    this.prop = prop;
+}
+```
+
+
+## 多态
+### 模拟方法重载
+`arguments`属性可以取得函数调用的实参个数，可以利用这一点模拟方法的重载。
+
+```js
+function demo(a, b ){
+	console.log(demo.length); // 得到形参个数
+	console.log(arguments.length); //得到实参个数
+	console.log(arguments[0]);  // 第一个实参 4
+	console.log(arguments[1]);  // 第二个实参 5
+}
+
+demo(4, 5, 6);
+```
+
+```js
+//实现可变长度实参的相加
+function add(){
+	var total = 0;
+	for( var i = arguments.length - 1; i >= 0; i--){
+		total += arguments[i];
+	}
+	return total;
+}
+
+console.log(add(1));  // 1
+console.log(add(1, 2, 3));  // 7
+
+
+// 参数不同的情况
+function fontSize(){
+	var ele = document.getElementById('js');
+	if(arguments.length == 0){
+		return ele.style.fontSize;
+	}else{
+		ele.style.fontSize = arguments[0];
+	}
+}
+fontSize(18);
+console.log(fontSize());
+
+// 类型不同的情况
+function setting(){
+	var ele = document.getElementById('js');
+	if(typeof arguments[0] === "object"){
+		for(var p in arguments[0]){
+			ele.style[p] = arguments[0][p];
+		}
+	}else{
+		ele.style.fontSize = arguments[0];
+		ele.style.backgroundColor = arguments[1];
+	}
+}
+setting(18, 'red');
+setting({fontSize:20, backgroundColor: 'green'});
+```
+
+### 方法重写
+
+```js
+function F(){}
+var f = new F();
+F.prototype.run = function(){
+	console.log('F');
+}
+f.run(); // F
+
+f.run = function(){
+	console.log('fff');
+}
+f.run();  // fff
+```
+
+## 抽象类
+在构造器中` throw new Error(''); `抛异常。这样防止这个类被直接调用。
+
+```js
+function DetectorBase() {
+    throw new Error('Abstract class can not be invoked directly!');
+}
+
+DetectorBase.prototype.detect = function() {
+    console.log('Detection starting...');
+};
+DetectorBase.prototype.stop = function() {
+    console.log('Detection stopped.');
+};
+DetectorBase.prototype.init = function() {
+    throw new Error('Error');
+};
+
+// var d = new DetectorBase();// Uncaught Error: Abstract class can not be invoked directly!
+
+function LinkDetector() {}
+LinkDetector.prototype = Object.create(DetectorBase.prototype);
+LinkDetector.prototype.constructor = LinkDetector;
+
+var l = new LinkDetector();
+console.log(l); //LinkDetector {}__proto__: LinkDetector
+l.detect(); //Detection starting...
+l.init(); //Uncaught Error: Error
+```
+## 参考资料
+
+[](https://gaohaoyang.github.io/2015/06/15/JavaScript-Object-Oriented/#section-6)
