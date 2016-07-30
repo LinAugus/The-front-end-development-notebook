@@ -334,4 +334,4 @@ l.init(); //Uncaught Error: Error
 ```
 ## 参考资料
 
-[](https://gaohaoyang.github.io/2015/06/15/JavaScript-Object-Oriented/#section-6)
+[JavaScript 面向对象](https://gaohaoyang.github.io/2015/06/15/JavaScript-Object-Oriented/#section-6)
