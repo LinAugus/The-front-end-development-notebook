@@ -413,6 +413,10 @@ p {
 6. 属性选择器
 7. 标签选择器
 
+
+### 文本格式化
+
+- 
 	
 ### 盒模型
 
@@ -429,4 +433,41 @@ css定位使用的是`position`属性，该属性有如下取值：
 | absolute   | 生成绝对定位的元素，相对于static定位以外的第一个祖先元素（offset parent）进行定位,元素的位置通过 left, top, right 以及 bottom 属性进行规定    |
 | fixed   | 生成绝对定位的元素，相对于浏览器窗口进行定位。元素的位置通过 left, top, right 以及 bottom 属性进行规定    |
 | sticky   | CSS3新属性，表现类似position:relative和position:fixed的合体，在目标区域在屏幕中可见时，它的行为就像position:relative; 而当页面滚动超出目标区域时，它的表现就像position:fixed，它会固定在目标位置    |
+
+`static` 是默认值。任意 `position: static;` 的元素不会被特殊的定位。
+
+在一个相对定位（position属性的值为`relative`）的元素上设置 top 、 right 、 bottom 和 left 属性会使其偏离其正常位置。其他的元素则不会调整位置来弥补它偏离后剩下的空隙。
+
+一个固定定位（position属性的值为`fixed`）元素会相对于视窗来定位，这意味着即便页面滚动，它还是会停留在相同的位置。和 relative 一样， top 、 right 、 bottom 和 left 属性都可用。
+
+`absolute` 是最棘手的position值。 `absolute` 与 `fixed` 的表现类似，除了它不是相对于视窗而是相对于最近的“positioned”祖先元素。如果绝对定位的元素没有“positioned”祖先元素，那么它是相对于文档的 body 元素，并且它会随着页面滚动而移动。记住个“positioned”元素是指 position 值不是 static 的元素。
+
+
+
+### 浮动
+在 CSS 中，我们通过`float`属性实现元素的浮动。设置了`float`的元素会脱离普通文档流。
+
+浮动的框可以向左或向右移动，直到它的外边缘碰到包含框或另一个浮动框的边框为止。
+
+由于浮动框不在文档的普通流中，所以文档的普通流中的块框表现得就像浮动框不存在一样。
+
+
+#### 清除浮动
+由于设置了`float`属性的元素，已经脱离了普通流，那么它的父元素不会将其计算进自身高度里面，因此就会发生“高度塌陷”现象。我们为了避免这一情况，就需要闭合浮动，也叫清除浮动。
+
+下面是一个经典的清除浮动的例子：
+
+```css
+//利用伪元素闭合浮动
+.clearfix:after {
+     content:"."; 
+     display:block; 
+     height:0; 
+     visibility:hidden; 
+     clear:both; 
+}
+.clearfix { 
+    *zoom:1; 
+}
+```
 
