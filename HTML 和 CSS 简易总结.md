@@ -416,7 +416,18 @@ p {
 
 ### 文本格式化
 
-- 
+- `font-family`
+- `font-size`
+- `font-weight`
+- `font-face`
+- `color`
+- `line-height`
+- `text-align`
+- `text-indent`
+- `text-transform`
+- `text-decoration`
+- `word-spacing`
+- `white-space`
 	
 ### 盒模型
 
