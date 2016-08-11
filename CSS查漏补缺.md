@@ -212,13 +212,226 @@ BFC 正是属于普通流的，因此它对兄弟元素也不会造成什么影�
 
 传统的布局中，当我们需要改变两栏的互换，就会很麻烦。因为还要涉及到 HTML 代码的修改，不能完全从 CSS 上更改，这叫 HTML 和 CSS 的耦合。而圣杯布局跟双飞翼布局就是能够不考虑主体的位置，能够只通过 CSS 代码就改变相应的布局，这也是优点之一。
 
-```html
+### 圣杯布局
 
+试试这样的HTML结构：
+
+```html
+<div class="header">header</div>
+<div class="container">
+    <div class="main">main</div>
+    <div class="sub">sub</div>
+    <div class="extra">extra</div>
+</div>
+<div class="footer">footer</div>
 ```
 
+给它加上CSS样式：
 
+```css
+body{ margin: 0; padding: 0; font-size: 1.5em; font-weight: bold; min-width: 500px;}
+.header,.footer{ text-align: center;}
+.header{ height: 50px; background-color: #76ffff;}
+.footer{ height: 50px; background-color: #ff7676;}
+.main{ background-color: #666;}
+.sub{ background-color: #44fa44;}
+.extra{ background-color: #3dbdff;}
+/*start*/
+.main{
+    width: 100%;
+    float: left;
+}
+.sub{
+    width: 100px;
+    float: left;
+    margin-left: -100%;
+}
+.extra{
+    width: 200px;
+    float: left;
+    margin-left: -200px;
+}
+.container{
+    overflow: hidden;//BFC，撑高高度
+}
+```
+结果如下：
+![011542497982872.png](http://upload-images.jianshu.io/upload_images/112419-2072bb4dcd5f9f25.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
+会发现，main的位置不正确，所以再给它加上 `padding: 0 200px 0 100px`;
 
-## normalize和reset.css
+![011544456578941.png](http://upload-images.jianshu.io/upload_images/112419-7bc25265fadca623.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+虽然 main 的位置正确了，可是 sub 和 extra 位置优点不对，所以我们再用上相对定位，为 sub 和 extra 加上如下代码：
+
+```css
+.sub{
+    position: relative;;
+    left: -100px;
+}
+.extra{
+    position: relative;
+    right: -200px;
+}
+```
+效果就出来了，
+![011547019548969.png](http://upload-images.jianshu.io/upload_images/112419-bcab4443f3dbb1cf.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+噢耶，这就是圣杯布局。如果在圣杯布局的基础上，给它一个多余的标签，把 mian 包起来，这就是双飞翼布局。
+
+### 双飞翼布局
+
+HTML结构：
+
+```html
+<div class="header">header</div>
+<div class="container">
+    <div class="main">
+        <div class="main-wrap">main</div>
+    </div>
+    <div class="sub">sub</div>
+    <div class="extra">extra</div>
+</div>
+<div class="footer">footer</div>
+```
+CSS结构：
+
+```css
+body{ margin: 0; padding: 0; font-size: 1.5em; font-weight: bold; min-width: 500px;}
+.header,.footer{ text-align: center;}
+.header{ height: 50px; background-color: #76ffff;}
+.footer{ height: 50px; background-color: #ff7676;}
+.main{ background-color: #666;}
+.sub{ background-color: #44fa44;}
+.extra{ background-color: #3dbdff;}
+/*start*/
+.main{
+    width: 100%;
+    height: 100px;
+    float: left;
+}
+.sub{
+    width: 100px;
+    height: 100px;
+    float: left;
+    margin-left: -100%;
+}
+.extra{
+    width: 200px;
+    height: 100px;
+    float: left;
+    margin-left: -200px;
+}
+.main-wrap{
+    margin: 0 200px 0 100px;
+}
+.container{
+    height: 100px;
+    overflow: hidden;
+    *zoom: 1;
+}
+```
+可以看到，只要为包住 main-wrap 设置 margin，连相对定位都没用到，效果就出来了。
+![011558067042018.png](http://upload-images.jianshu.io/upload_images/112419-a4a678a15ff3393e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+> 如果把三栏布局比作一只大鸟，可以把main看成是鸟的身体，sub和extra则是鸟的翅膀。这个布局的实现思路是，先把最重要的身体部分放好，然后再将翅膀移动到适当的地方。因此请容许我给这个布局实现取名为双飞翼布局（Flying Swing Layout）.
+就如上图中的鸟有各种姿势一样，利用双飞翼布局，我们也可以实现各种布局。这里有个尝试页面，利用双飞翼，实现了一套栅格化布局系统。
+
+优点：
+
+- 实现了内容与布局的分离，这是渐进式增强布局的思想，从内容出发，不考虑布局。
+- main部分是自适应宽度的，很容易在定宽布局和流体布局中切换。
+- 任何一栏都可以是最高栏，不会出问题。
+- 需要的hack非常少（就一个针对ie6的清除浮动hack:_zoom: 1;）
+在浏览器上的兼容性非常好，IE5.5以上都支持。
+
+缺点：
+
+- main需要一个额外的包裹层。
+
+## normalize.css和reset.css
+normalize 的理念则是尽量保留浏览器的默认样式，不进行太多的重置。
+
+reset 的目的，是将所有的浏览器的自带样式重置掉，这样更易于保持各浏览器渲染的一致性。
+
+```css
+/* reset */
+html,body,h1,h2,h3,h4,h5,h6,div,dl,dt,dd,ul,ol,li,p,blockquote,pre,hr,figure,table,caption,th,td,form,fieldset,legend,input,button,textarea,menu{margin:0;padding:0;}
+header,footer,section,article,aside,nav,hgroup,address,figure,figcaption,menu,details{display:block;}
+table{border-collapse:collapse;border-spacing:0;}
+caption,th{text-align:left;font-weight:normal;}
+html,body,fieldset,img,iframe,abbr{border:0;}
+i,cite,em,var,address,dfn{font-style:normal;}
+[hidefocus],summary{outline:0;}
+li{list-style:none;}
+h1,h2,h3,h4,h5,h6,small{font-size:100%;}
+sup,sub{font-size:83%;}
+pre,code,kbd,samp{font-family:inherit;}
+q:before,q:after{content:none;}
+textarea{overflow:auto;resize:none;}
+label,summary{cursor:default;}
+a,button{cursor:pointer;}
+h1,h2,h3,h4,h5,h6,em,strong,b{font-weight:bold;}
+del,ins,u,s,a,a:hover{text-decoration:none;}
+body,textarea,input,button,select,keygen,legend{font:12px/1.14 arial,\5b8b\4f53;color:#333;outline:0;}
+body{background:#fff;}
+a,a:hover{color:#333;}
+```
+
+以上reset来自[NEC](http://nec.netease.com/framework/css-reset.html)的css reset。
+
+拓展阅读：
+[Normalize.css 和 Reset CSS 有什么本质区别？](https://segmentfault.com/q/1010000000117189)
 
 ## IE条件注释
+IE条件注释是一种特殊的HTML注释，这种注释只有IE5.0及以上版本才能理解。比如普通的HTML注释是：
+
+```html
+<!--This is a comment-->
+　　而只有IE可读的IE条件注释是：
+<!--[if IE]> <![endif]-->
+　　“非IE条件注释”：
+<!--[if !IE]>--> non-IE HTML Code <!--<![endif]-->
+　　“非特定版本IE条件注释”（很少用到）：
+<!--[if ! lt IE 7]>
+<![IGNORE[--><![IGNORE[]]>
+Code for browsers that match the if condition
+<!--<![endif]-->
+```
+简而言之，除了“Windows上的IE”之外的所有浏览器都会认为条件注释只是一段普通的HTML注释。你不能在CSS代码中使用条件注释。IE条件注释是很有用的对IE隐藏或者展现特定代码的方法，比起在CSS中用诡异的_/制造bug，利用IE条件注释来写CSS “hacks”是更合理的方法。通俗点，条件注释就是一些if判断，但这些判断不是在脚本里执行的，而是直接在html代码里执行的。
+
+1. 条件注释的基本结构和HTML的注释(<!– –>)是一样的。因此IE以外的浏览器将会把它们看作是普通的注释而完全忽略它们。
+2. IE将会根据if条件来判断是否如解析普通的页面内容一样解析条件注释里的内容。
+3. 条件注释使用的是HTML的注释结构，因此他们只能使用在HTML文件里，而不能在CSS文件中使用。
+
+从语法上看这是相当合法的普通HTML注释。任何浏览器都会认为<!–和–>之间的部分是注释从而忽略它。但是IE也会看到其中[if IE]>，从而开始解释接下来的代码直到遇到<![endif]。所以，下面这些代码不会显示在任何其他浏览器中面。
+
+通过“比较操作符”可以更灵活地对IE版本进行控制，用法是在IE前面加上“比较操作符”。合法的操作符如下：
+
+- lte：就是Less than or equal to的简写，也就是小于或等于的意思。
+- lt ：就是Less than的简写，也就是小于的意思。
+- gte：就是Greater than or equal to的简写，也就是大于或等于的意思。
+- gt ：就是Greater than的简写，也就是大于的意思。
+- ! ：就是不等于的意思，跟javascript里的不等于判断符相同
+
+```html
+<!–[if gt IE 5.5]> / 如果IE版本大于5.5 /
+<!–[if lte IE 6]> / 如果IE版本小于等于6 /
+<!–[if !IE]> / 如果浏览器不是IE /
+```
+
+常用的IE条件注释
+
+```html
+<!--[if !IE]>除IE外都可识别<![endif]-->
+<!--[if IE]> 所有的IE可识别 <![endif]-->
+<!--[if IE 5.0]> 只有IE5.0可以识别 <![endif]-->
+<!--[if IE 5]> 仅IE5.0与IE5.5可以识别 <![endif]-->
+<!--[if gt IE 5.0]> IE5.0以及IE5.0以上版本都可以识别 <![endif]-->
+<!--[if IE 6]> 仅IE6可识别 <![endif]-->
+<!--[if lt IE 6]> IE6以及IE6以下版本可识别 <![endif]-->
+<!--[if gte IE 6]> IE6以及IE6以上版本可识别 <![endif]-->
+<!--[if IE 7]> 仅IE7可识别 <![endif]-->
+<!--[if lt IE 7]> IE7以及IE7以下版本可识别 <![endif]-->
+<!--[if gte IE 7]> IE7以及IE7以上版本可识别 <![endif]-->
+```
